@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guadalajara Wine Finder</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; max-width: 980px; }
+      .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+      section { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+      input, select, button, textarea { padding: 8px; }
+      pre { white-space: pre-wrap; word-break: break-word; background: #f9f9f9; padding: 10px; border-radius: 8px; }
+      .muted { color: #555; font-size: 0.9rem; }
+    </style>
+  </head>
+  <body>
+    <h1 id="title">Guadalajara Wine Finder</h1>
+    <p class="muted" id="subtitle">Batch-first recommendations for User A and User B.</p>
+
+    <section>
+      <h2 id="authTitle">Login</h2>
+      <div class="row">
+        <label>User
+          <select id="userId">
+            <option value="A">A</option>
+            <option value="B">B</option>
+          </select>
+        </label>
+        <label>Password <input id="password" type="password" value="changeme-a" /></label>
+        <button id="loginBtn">Login</button>
+        <label>Language
+          <select id="localeSelect">
+            <option value="en">EN</option>
+            <option value="ru">RU</option>
+          </select>
+        </label>
+      </div>
+      <p id="me"></p>
+    </section>
+
+    <section>
+      <h2 id="homeTitle">Home</h2>
+      <div class="row">
+        <button id="refreshHealth">Refresh Health</button>
+        <button id="loadBuys">Recommended Buys</button>
+        <button id="loadFavorites">Cheapest Favorites</button>
+        <button id="manualRun">Manual Run</button>
+      </div>
+      <pre id="healthOut">{}</pre>
+      <pre id="recommendationsOut">[]</pre>
+    </section>
+
+    <section>
+      <h2 id="triedTitle">Tried Wines</h2>
+      <div class="row">
+        <input id="queryInput" placeholder="Search by name" />
+        <button id="searchTried">Search</button>
+      </div>
+      <pre id="triedOut">[]</pre>
+    </section>
+
+    <section>
+      <h2 id="ratingTitle">Add Rating</h2>
+      <div class="row">
+        <label>Wine ID <input id="wineIdInput" type="number" min="1" /></label>
+        <label>Rating
+          <select id="ratingInput">
+            <option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option>
+          </select>
+        </label>
+      </div>
+      <textarea id="commentInput" rows="3" cols="60" placeholder="Comment"></textarea>
+      <br />
+      <button id="submitRating">Submit Rating</button>
+      <pre id="ratingOut">{}</pre>
+    </section>
+
+    <script>
+      const T = {
+        en: {
+          title: "Guadalajara Wine Finder",
+          subtitle: "Batch-first recommendations for User A and User B.",
+          authTitle: "Login",
+          homeTitle: "Home",
+          triedTitle: "Tried Wines",
+          ratingTitle: "Add Rating"
+        },
+        ru: {
+          title: "Guadalajara Wine Finder",
+          subtitle: "Рекомендации в пакетном режиме для пользователей A и B.",
+          authTitle: "Вход",
+          homeTitle: "Главная",
+          triedTitle: "Пробованные вина",
+          ratingTitle: "Добавить оценку"
+        }
+      };
+
+      let token = "";
+      let locale = "en";
+
+      function setLocale(next) {
+        locale = next;
+        for (const [id, text] of Object.entries(T[locale])) {
+          document.getElementById(id).textContent = text;
+        }
+      }
+
+      function authHeaders() {
+        return token ? { Authorization: `Bearer ${token}` } : {};
+      }
+
+      async function api(url, opts = {}) {
+        const headers = { "Content-Type": "application/json", ...(opts.headers || {}), ...authHeaders() };
+        const res = await fetch(url, { ...opts, headers });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.detail || `HTTP ${res.status}`);
+        return body;
+      }
+
+      document.getElementById("localeSelect").addEventListener("change", (e) => setLocale(e.target.value));
+
+      document.getElementById("loginBtn").addEventListener("click", async () => {
+        try {
+          const userId = document.getElementById("userId").value;
+          const password = document.getElementById("password").value;
+          const result = await api("/auth/login", {
+            method: "POST",
+            body: JSON.stringify({ user_id: userId, password })
+          });
+          token = result.access_token;
+          const me = await api("/users/me");
+          document.getElementById("me").textContent = `${me.display_name} (${me.id}) locale=${me.locale}`;
+        } catch (err) {
+          alert(err.message);
+        }
+      });
+
+      document.getElementById("refreshHealth").addEventListener("click", async () => {
+        document.getElementById("healthOut").textContent = JSON.stringify(await api("/health"), null, 2);
+      });
+
+      document.getElementById("loadBuys").addEventListener("click", async () => {
+        document.getElementById("recommendationsOut").textContent = JSON.stringify(
+          await api("/recommendations?kind=recommended_buys"), null, 2
+        );
+      });
+
+      document.getElementById("loadFavorites").addEventListener("click", async () => {
+        document.getElementById("recommendationsOut").textContent = JSON.stringify(
+          await api("/favorites/cheapest"), null, 2
+        );
+      });
+
+      document.getElementById("manualRun").addEventListener("click", async () => {
+        const result = await api("/runs/trigger", {
+          method: "POST",
+          body: JSON.stringify({ mode: "manual" })
+        });
+        document.getElementById("healthOut").textContent = JSON.stringify(result, null, 2);
+      });
+
+      document.getElementById("searchTried").addEventListener("click", async () => {
+        const q = encodeURIComponent(document.getElementById("queryInput").value || "");
+        document.getElementById("triedOut").textContent = JSON.stringify(
+          await api(`/wines/tried?query=${q}`), null, 2
+        );
+      });
+
+      document.getElementById("submitRating").addEventListener("click", async () => {
+        const wineId = Number(document.getElementById("wineIdInput").value);
+        const rating = Number(document.getElementById("ratingInput").value);
+        const comment = document.getElementById("commentInput").value;
+        const result = await api("/ratings", {
+          method: "POST",
+          body: JSON.stringify({ wine_id: wineId, rating_1_5: rating, comment })
+        });
+        document.getElementById("ratingOut").textContent = JSON.stringify(result, null, 2);
+      });
+
+      setLocale("en");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "avg_rating",
+    "rating_scale",
+    "descriptors",
+    "pros",
+    "cons",
+    "disagreement_summary"
+  ],
+  "properties": {
+    "avg_rating": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+    "rating_scale": { "type": ["string", "null"] },
+    "descriptors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["tag", "confidence"],
+        "properties": {
+          "tag": { "type": "string", "minLength": 1 },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "pros": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "cons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "disagreement_summary": { "type": "string" }
+  }
+}
