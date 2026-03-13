@@ -17,3 +17,15 @@ def test_pipeline_run_creates_outputs() -> None:
 
         rec_count = session.query(Recommendation).filter(Recommendation.run_id == result.run_id).count()
         assert rec_count >= 1
+
+
+def test_pipeline_can_run_twice_without_raw_page_conflict() -> None:
+    with Session(engine) as session:
+        first = run_pipeline(session, mode="manual")
+        second = run_pipeline(session, mode="manual")
+        assert first.status == "success"
+        assert second.status == "success"
+
+        run = session.get(RecommendationRun, second.run_id)
+        assert run is not None
+        assert Path(run.logs_ref).exists()

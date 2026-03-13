@@ -47,6 +47,7 @@ End-to-end API and pipeline behavior:
   - full pipeline run
   - run summary artifact creation
   - recommendation persistence
+  - idempotent rerun behavior for raw page ingestion
 
 ## 1.3 Contract tests
 

@@ -54,7 +54,7 @@ def test_parse_token_rejects_expired_token() -> None:
     ts = int(time.time()) - TOKEN_TTL_SECONDS - 5
     payload = f"A:{ts}"
     signature = hmac.new(settings.app_secret.encode("utf-8"), payload.encode("utf-8"), "sha256").hexdigest()
-    token = base64.urlsafe_b64encode(f"{payload}:{signature}".encode("utf-8")).decode("ascii")
+    token = base64.urlsafe_b64encode(f"{payload}:{signature}".encode()).decode("ascii")
 
     with pytest.raises(HTTPException) as exc:
         parse_token(token)

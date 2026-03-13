@@ -116,6 +116,13 @@ def _fetch_and_store_pages(
             file_path = raw_dir / f"{content_hash}.html"
             file_path.write_text(text, encoding="utf-8")
 
+            existing = session.execute(
+                select(RawPage).where(RawPage.url == url, RawPage.content_hash == content_hash)
+            ).scalar_one_or_none()
+            if existing is not None:
+                captured.append(existing)
+                continue
+
             row = RawPage(
                 store_id=store_id,
                 url=url,
