@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WineApp &mdash; Daily Best Wine Deals</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <h1>&#127863; WineApp</h1>
+    <p class="subtitle">Daily best wine deals &mdash; {{ deal_date }}</p>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- Summary Card -->
+  <section class="summary-card">
+    <div class="stat">
+      <span class="stat-value">{{ summary.total_deals }}</span>
+      <span class="stat-label">Deals Today</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">{{ summary.avg_discount }}%</span>
+      <span class="stat-label">Avg Discount</span>
+    </div>
+    {% if summary.best_deal %}
+    <div class="stat highlight">
+      <span class="stat-value">{{ summary.best_deal.discount_pct }}%</span>
+      <span class="stat-label">Best Savings</span>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Deals Grid -->
+  <section class="deals-grid">
+    {% for deal in deals %}
+    <article class="deal-card">
+      <div class="deal-badge">-{{ deal.discount_pct }}%</div>
+      <h2 class="deal-name">{{ deal.name }}</h2>
+      <p class="deal-meta">{{ deal.region }} &middot; {{ deal.grape }}</p>
+      <div class="deal-prices">
+        <span class="price-original">${{ "%.2f"|format(deal.original_price) }}</span>
+        <span class="price-deal">${{ "%.2f"|format(deal.deal_price) }}</span>
+      </div>
+      <p class="deal-source">via {{ deal.source }}</p>
+    </article>
+    {% endfor %}
+  </section>
+
+  {% if not deals %}
+  <p class="empty-state">No deals found for {{ deal_date }}. Try refreshing!</p>
+  {% endif %}
+
+</main>
+
+<footer>
+  <div class="container">
+    <p>WineApp &copy; 2026 &mdash; Pure Python, no Databricks required.</p>
+  </div>
+</footer>
+
+</body>
+</html>
