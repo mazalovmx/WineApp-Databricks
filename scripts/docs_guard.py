@@ -4,7 +4,6 @@ import argparse
 import json
 import subprocess
 from datetime import datetime
-from pathlib import Path
 
 from app.quality import ensure_artifact_dir, evaluate_docs_policy
 
