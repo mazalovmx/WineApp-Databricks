@@ -132,3 +132,44 @@ def test_frontend_routes_serve_html() -> None:
             response = client.get(path)
             assert response.status_code == 200
             assert "text/html" in response.headers["content-type"]
+
+
+def test_user_settings_read_and_update() -> None:
+    with TestClient(app) as client:
+        headers = _auth_headers(client, user_id="B", password="changeme-b")
+        current = client.get("/users/me/settings", headers=headers)
+        assert current.status_code == 200
+        assert current.json()["user_id"] == "B"
+
+        updated = client.patch("/users/me/settings", headers=headers, json={"locale": "en"})
+        assert updated.status_code == 200
+        assert updated.json()["locale"] == "en"
+
+        me = client.get("/users/me", headers=headers)
+        assert me.status_code == 200
+        assert me.json()["locale"] == "en"
+
+
+def test_user_can_delete_own_rating_but_not_other_user_rating() -> None:
+    with TestClient(app) as client:
+        headers_a = _auth_headers(client, user_id="A", password="changeme-a")
+        trigger = client.post("/runs/trigger", headers=headers_a, json={"mode": "manual"})
+        assert trigger.status_code == 200
+
+        recs = client.get("/recommendations?kind=recommended_buys", headers=headers_a).json()["items"]
+        wine_id = recs[0]["wine_id"]
+        create = client.post(
+            "/ratings",
+            headers=headers_a,
+            json={"wine_id": wine_id, "rating_1_5": 4, "comment": "to delete"},
+        )
+        assert create.status_code == 200
+        rating_id = create.json()["rating_id"]
+
+        headers_b = _auth_headers(client, user_id="B", password="changeme-b")
+        forbidden = client.delete(f"/ratings/{rating_id}", headers=headers_b)
+        assert forbidden.status_code == 403
+
+        deleted = client.delete(f"/ratings/{rating_id}", headers=headers_a)
+        assert deleted.status_code == 200
+        assert deleted.json()["deleted_rating_id"] == rating_id

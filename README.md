@@ -20,6 +20,8 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
    - `python scripts/run_pipeline.py --mode daily`
 4. Run tests:
    - `pytest -q`
+5. Run in Docker:
+   - `docker compose up -d --build`
 
 ## Defaults
 
@@ -43,6 +45,7 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 - `docs/frontend-api-contract.md`
 - `docs/frontend-design-tokens.md`
 - `docs/frontend-acceptance-checklists.md`
+- `docs/plans/frontend-user-journeys-25.md`
 
 ## Testing docs
 
@@ -58,6 +61,11 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 - `docs/plans/repository-hygiene-plan.md`
 - `docs/policies/docs-as-code.md`
 - `docs/one_time/README.md`
+
+## Deployment and provider docs
+
+- `docs/deployment.md`
+- `docs/llm-agnostic.md`
 
 Quality/doc enforcement scripts:
 

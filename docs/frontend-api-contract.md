@@ -31,6 +31,23 @@ Response:
 - `display_name`: `string`
 - `locale`: `string`
 
+## 2.3 `GET /users/me/settings`
+
+Response:
+- `user_id`: `"A" | "B"`
+- `locale`: `"en" | "ru"`
+- `updated_at`: `string`
+
+## 2.4 `PATCH /users/me/settings`
+
+Request:
+- `locale`: `"en" | "ru"`
+
+Response:
+- `user_id`: `"A" | "B"`
+- `locale`: `"en" | "ru"`
+- `updated_at`: `string`
+
 ## 3. Health and Status
 
 ## 3.1 `GET /health`
@@ -79,6 +96,7 @@ Response: array of tried wine objects
 - `wine_id`: number
 - `canonical_name`: string
 - `ratings`: array
+  - `rating_id`: number
   - `rating_1_5`: number
   - `comment`: string | null
   - `tried_at`: string
@@ -101,6 +119,17 @@ Response:
 Frontend behavior:
 - Disable submit while pending.
 - Show success toast and refresh tried wines context.
+
+## 6.2 `DELETE /ratings/{rating_id}`
+
+Response:
+- `ok`: `boolean`
+- `deleted_rating_id`: `number`
+
+Frontend behavior:
+- Allow deletion only for current user owned ratings.
+- Require confirmation in UI before delete.
+- Refresh tried-wines panel after delete.
 
 ## 7. Manual Runs
 
@@ -134,6 +163,7 @@ Response:
 2. Frontend must treat explanation text as server-owned content.
 3. Client-side sorting must not alter rank semantics from backend.
 4. Missing fields must render as `Unknown`, not omitted.
+5. Session state (`authToken`, `activeUser`, `locale`) is client-side; locale is also persisted server-side via `/users/me/settings`.
 
 ## 10. Anti-Requirements
 

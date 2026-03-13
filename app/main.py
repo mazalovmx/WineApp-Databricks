@@ -26,6 +26,8 @@ from app.schemas import (
     TriedWineItem,
     TriggerRunRequest,
     UserMeResponse,
+    UserSettingsResponse,
+    UserSettingsUpdateRequest,
 )
 from app.time_utils import utc_now_naive
 
@@ -98,6 +100,33 @@ def me(
     if user is None:
         raise HTTPException(status_code=404, detail="User not found.")
     return UserMeResponse(id=user.id, display_name=user.display_name, locale=user.locale)
+
+
+@app.get("/users/me/settings", response_model=UserSettingsResponse)
+def my_settings(
+    current_user: Annotated[AuthUser, Depends(get_current_user)],
+    session: Session = Depends(get_session),
+) -> UserSettingsResponse:
+    user = session.get(User, current_user.id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return UserSettingsResponse(user_id=user.id, locale=user.locale, updated_at=utc_now_naive())
+
+
+@app.patch("/users/me/settings", response_model=UserSettingsResponse)
+def update_my_settings(
+    payload: UserSettingsUpdateRequest,
+    current_user: Annotated[AuthUser, Depends(get_current_user)],
+    session: Session = Depends(get_session),
+) -> UserSettingsResponse:
+    user = session.get(User, current_user.id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    user.locale = payload.locale
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return UserSettingsResponse(user_id=user.id, locale=user.locale, updated_at=utc_now_naive())
 
 
 @app.get("/recommendations", response_model=RecommendationsResponse)
@@ -194,6 +223,7 @@ def tried_wines(
             )
         grouped[wine.id].ratings.append(
             {
+                "rating_id": rating.id,
                 "rating_1_5": rating.rating_1_5,
                 "comment": rating.comment,
                 "tried_at": rating.tried_at.isoformat(),
@@ -221,6 +251,22 @@ def add_rating(
     session.add(row)
     session.commit()
     return {"ok": True, "rating_id": row.id}
+
+
+@app.delete("/ratings/{rating_id}")
+def delete_rating(
+    rating_id: int,
+    current_user: Annotated[AuthUser, Depends(get_current_user)],
+    session: Session = Depends(get_session),
+) -> dict[str, object]:
+    row = session.get(UserRating, rating_id)
+    if row is None:
+        raise HTTPException(status_code=404, detail="Rating not found.")
+    if row.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot delete another user's rating.")
+    session.delete(row)
+    session.commit()
+    return {"ok": True, "deleted_rating_id": rating_id}
 
 
 @app.post("/runs/trigger")

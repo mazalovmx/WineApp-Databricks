@@ -23,6 +23,7 @@
 - [ ] Rating history is visible per wine.
 - [ ] Comments render safely and legibly.
 - [ ] Optional last known price appears when available.
+- [ ] User can delete own rating from history and item disappears after refresh.
 
 ## 4. Add Rating
 
@@ -35,6 +36,7 @@
 
 - [ ] User switch updates user-bound data.
 - [ ] Locale selection persists during current session.
+- [ ] Locale can be saved to backend user settings and restored after login.
 - [ ] Manual run action visible only for authorized user.
 - [ ] Manual run feedback includes status and run id.
 

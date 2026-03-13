@@ -15,6 +15,8 @@ Focused logic tests without full HTTP flow:
   - default-user bootstrap behavior
 - `tests/test_llm_client_unit.py`
   - mock search result shape
+  - generic HTTP adapter request/response mapping
+  - provider factory validation for agnostic configuration
   - structured offer parsing (valid + malformed rows)
   - review descriptor extraction behavior
   - entity-matching low-confidence behavior
@@ -40,6 +42,8 @@ End-to-end API and pipeline behavior:
   - protected endpoint authorization
   - recommendations flow with manual run
   - rating submit + tried wines query
+  - rating delete ownership constraints
+  - user settings read/update persistence
   - favorites population after rating + rerun
   - frontend route serving
   - empty and forbidden states

@@ -86,6 +86,9 @@ Derived state:
 - `isDataStale`
 - `manualRunAllowed` (user A only)
 
+Persisted server-side user settings:
+- `locale` via `/users/me/settings`
+
 ## 7. Empty/Error/Loading States
 
 - Loading: skeleton rows for lists; spinner for submit actions.
@@ -95,6 +98,10 @@ Derived state:
 - Error:
   - Auth failure: clear token and redirect to login state.
   - API unavailable: show retry action and last-known refresh age.
+
+Destructive action support:
+- User can delete own rating entries from Tried Wines detail view.
+- Delete action requires explicit confirmation before API call.
 
 ## 8. Anti-Requirements
 

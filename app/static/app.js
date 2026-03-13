@@ -48,6 +48,7 @@
       triedAt: "Tried at",
       submitRating: "Submit Rating",
       ratingSuccess: "Rating saved successfully.",
+      ratingDeleted: "Rating deleted.",
       triggerHint: "If recommendations are empty, trigger a manual run.",
       authRequired: "Please login to load user-specific data.",
       runCompleted: "Run completed successfully.",
@@ -74,7 +75,12 @@
       recommendationError: "Unable to load recommendations.",
       triedError: "Unable to load tried wines.",
       settingsHelp: "Use these controls to manage locale, active user, and pipeline runs.",
+      saveSettings: "Save User Settings",
+      settingsSaved: "User settings saved.",
       loginHelp: "Login is required for recommendations, tried wines, and ratings.",
+      delete: "Delete",
+      deleteConfirm: "Delete this rating?",
+      userSettings: "User Configuration",
       pageStatus: "Status",
       loading: "Loading...",
       notAvailable: "N/A",
@@ -120,6 +126,7 @@
       triedAt: "Дата дегустации",
       submitRating: "Сохранить оценку",
       ratingSuccess: "Оценка успешно сохранена.",
+      ratingDeleted: "Оценка удалена.",
       triggerHint: "Если рекомендации пустые, запустите ручной прогон.",
       authRequired: "Войдите, чтобы загрузить пользовательские данные.",
       runCompleted: "Прогон успешно завершен.",
@@ -146,7 +153,12 @@
       recommendationError: "Не удалось загрузить рекомендации.",
       triedError: "Не удалось загрузить пробованные вина.",
       settingsHelp: "Здесь можно изменить язык, пользователя и запустить pipeline.",
+      saveSettings: "Сохранить настройки пользователя",
+      settingsSaved: "Настройки пользователя сохранены.",
       loginHelp: "Для рекомендаций, оценок и истории нужен вход.",
+      delete: "Удалить",
+      deleteConfirm: "Удалить эту оценку?",
+      userSettings: "Конфигурация пользователя",
       pageStatus: "Статус",
       loading: "Загрузка...",
       notAvailable: "Н/Д",
@@ -171,6 +183,7 @@
       ratingSubmit: false,
       runTrigger: false,
       runInfo: false,
+      settingsSave: false,
     },
     recommended: [],
     favorites: [],
@@ -337,6 +350,13 @@
             — ${escapeHtml(formatDate(entry.tried_at))}
             <br />
             <span>${escapeHtml(entry.comment || t("unknown"))}</span>
+            ${
+              entry.rating_id
+                ? `<br /><button class="button button-secondary" data-action="delete-rating" data-rating-id="${escapeHtml(
+                    entry.rating_id
+                  )}">${escapeHtml(t("delete"))}</button>`
+                : ""
+            }
           </li>
         `
       )
@@ -511,6 +531,15 @@
         <h2>${escapeHtml(t("settings"))}</h2>
         <p class="muted">${escapeHtml(t("settingsHelp"))}</p>
         <div class="form-grid">
+          <p><strong>${escapeHtml(t("userSettings"))}</strong></p>
+          <div class="inline">
+            <button
+              class="button button-secondary"
+              data-action="save-user-settings"
+              ${state.loading.settingsSave ? "disabled" : ""}
+              ${state.token ? "" : "disabled"}
+            >${state.loading.settingsSave ? escapeHtml(t("loading")) : escapeHtml(t("saveSettings"))}</button>
+          </div>
           <label>${escapeHtml(t("scheduleMode"))}
             <select id="runModeInput">
               <option value="daily" ${state.runMode === "daily" ? "selected" : ""}>${escapeHtml(t("modeDaily"))}</option>
@@ -633,6 +662,19 @@
     }
   }
 
+  async function loadUserSettings() {
+    if (!state.token) return;
+    try {
+      const settingsPayload = await api("/users/me/settings");
+      if (settingsPayload && (settingsPayload.locale === "en" || settingsPayload.locale === "ru")) {
+        state.locale = settingsPayload.locale;
+        saveSession();
+      }
+    } catch (error) {
+      setStatus("status-error", String(error.message || error));
+    }
+  }
+
   async function loadHealth() {
     state.loading.health = true;
     render();
@@ -734,6 +776,28 @@
     }
   }
 
+  async function saveUserSettings() {
+    if (!state.token) {
+      setStatus("status-error", t("authRequired"));
+      return;
+    }
+    state.loading.settingsSave = true;
+    render();
+    try {
+      const payload = { locale: state.locale };
+      await api("/users/me/settings", {
+        method: "PATCH",
+        body: JSON.stringify(payload),
+      });
+      setStatus("status-fresh", t("settingsSaved"));
+    } catch (error) {
+      setStatus("status-error", String(error.message || error));
+    } finally {
+      state.loading.settingsSave = false;
+      render();
+    }
+  }
+
   async function submitRating() {
     if (!state.token) {
       setStatus("status-error", t("authRequired"));
@@ -768,6 +832,23 @@
     } finally {
       state.loading.ratingSubmit = false;
       render();
+    }
+  }
+
+  async function deleteRating(ratingId) {
+    if (!state.token) {
+      setStatus("status-error", t("authRequired"));
+      return;
+    }
+    if (!window.confirm(t("deleteConfirm"))) {
+      return;
+    }
+    try {
+      await api(`/ratings/${ratingId}`, { method: "DELETE" });
+      await loadTriedWines();
+      setStatus("status-fresh", t("ratingDeleted"));
+    } catch (error) {
+      setStatus("status-error", String(error.message || error));
     }
   }
 
@@ -821,6 +902,7 @@
             state.token = result.access_token;
             saveSession();
             await loadMe();
+            await loadUserSettings();
             await loadRouteData();
             await loadHealth();
             render();
@@ -850,6 +932,11 @@
         return;
       }
 
+      if (action === "save-user-settings") {
+        void saveUserSettings();
+        return;
+      }
+
       if (action === "search-tried") {
         const queryInput = document.getElementById("queryInput");
         const wineTypeInput = document.getElementById("wineTypeInput");
@@ -873,6 +960,14 @@
         const wineId = Number(target.getAttribute("data-wine-id"));
         state.selectedWineId = Number.isFinite(wineId) ? wineId : null;
         render();
+        return;
+      }
+
+      if (action === "delete-rating") {
+        const ratingId = Number(target.getAttribute("data-rating-id"));
+        if (Number.isFinite(ratingId)) {
+          void deleteRating(ratingId);
+        }
         return;
       }
 
@@ -933,7 +1028,10 @@
   async function init() {
     bindEvents();
     render();
-    if (state.token) await loadMe();
+    if (state.token) {
+      await loadMe();
+      await loadUserSettings();
+    }
     await loadHealth();
     await loadRouteData();
     render();

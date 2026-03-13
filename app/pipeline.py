@@ -11,7 +11,7 @@ from sqlalchemy import Select, delete, func, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.llm_client import LLMClient, MockLLMClient
+from app.llm_client import LLMClient, build_llm_client_from_settings
 from app.matching import match_listed_wine
 from app.models import (
     ExternalReview,
@@ -401,7 +401,7 @@ def _write_recommendations(session: Session, run_id: str) -> int:
 
 
 def run_pipeline(session: Session, mode: str, llm: LLMClient | None = None) -> PipelineResult:
-    llm = llm or MockLLMClient()
+    llm = llm or build_llm_client_from_settings()
     run_id = utc_now_compact() + "-" + uuid.uuid4().hex[:8]
     run_dir, raw_dir = _ensure_dirs(run_id)
     started_at = utc_now_naive()

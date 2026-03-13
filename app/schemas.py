@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -20,6 +19,16 @@ class UserMeResponse(BaseModel):
     id: str
     display_name: str
     locale: str
+
+
+class UserSettingsResponse(BaseModel):
+    user_id: str
+    locale: str
+    updated_at: datetime
+
+
+class UserSettingsUpdateRequest(BaseModel):
+    locale: str = Field(pattern="^(en|ru)$")
 
 
 class HealthResponse(BaseModel):
@@ -43,10 +52,17 @@ class RecommendationsResponse(BaseModel):
     items: list[RecommendationItem]
 
 
+class RatingHistoryItem(BaseModel):
+    rating_id: int
+    rating_1_5: int
+    comment: str | None
+    tried_at: datetime
+
+
 class TriedWineItem(BaseModel):
     wine_id: int
     canonical_name: str
-    ratings: list[dict[str, Any]]
+    ratings: list[RatingHistoryItem]
     last_known_offer_price: float | None
 
 

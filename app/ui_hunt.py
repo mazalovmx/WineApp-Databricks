@@ -154,10 +154,12 @@ def run_ui_smoke_checks(run_id: str) -> UISmokeResult:
             headers=headers_a,
             json={"wine_id": wine_id, "rating_1_5": 4, "comment": "ui smoke"},
         )
+        rating_payload = _json(rating)
+        rating_id = rating_payload.get("rating_id")
         success, details = _check(
-            rating.status_code == 200 and _json(rating).get("ok") is True,
+            rating.status_code == 200 and rating_payload.get("ok") is True,
             f"rating submission ok for wine_id={wine_id}",
-            f"rating submission failed status={rating.status_code} payload={_json(rating)}",
+            f"rating submission failed status={rating.status_code} payload={rating_payload}",
         )
         record("rating_submit", success, details)
 
@@ -171,7 +173,36 @@ def run_ui_smoke_checks(run_id: str) -> UISmokeResult:
         )
         record("tried_wines_flow", success, details)
 
-        # 7) Permissions check for User B.
+        if rating_id is not None:
+            deleted = client.delete(f"/ratings/{rating_id}", headers=headers_a)
+            delete_payload = _json(deleted)
+            success, details = _check(
+                deleted.status_code == 200 and delete_payload.get("ok") is True,
+                f"rating deleted rating_id={rating_id}",
+                f"rating delete failed status={deleted.status_code} payload={delete_payload}",
+            )
+            record("rating_delete", success, details)
+
+        # 7) User settings config page API.
+        user_settings = client.get("/users/me/settings", headers=headers_a)
+        settings_payload = _json(user_settings)
+        success, details = _check(
+            user_settings.status_code == 200 and settings_payload.get("user_id") == "A",
+            "settings endpoint returns user config",
+            f"user settings failed status={user_settings.status_code} payload={settings_payload}",
+        )
+        record("user_settings_read", success, details)
+
+        saved_settings = client.patch("/users/me/settings", headers=headers_a, json={"locale": "ru"})
+        updated_payload = _json(saved_settings)
+        success, details = _check(
+            saved_settings.status_code == 200 and updated_payload.get("locale") == "ru",
+            "settings update persisted locale",
+            f"user settings update failed status={saved_settings.status_code} payload={updated_payload}",
+        )
+        record("user_settings_update", success, details)
+
+        # 8) Permissions check for User B.
         login_b = client.post("/auth/login", json={"user_id": "B", "password": "changeme-b"})
         token_b = _json(login_b).get("access_token", "")
         headers_b = {"Authorization": f"Bearer {token_b}"} if token_b else {}

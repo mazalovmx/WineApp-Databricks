@@ -17,6 +17,9 @@ def test_ui_issue_hunt_smoke_checks_pass() -> None:
         "manual_run_a",
         "recommended_buys",
         "tried_wines_flow",
+        "rating_delete",
+        "user_settings_read",
+        "user_settings_update",
         "permission_user_b_trigger",
     }:
         assert expected in names

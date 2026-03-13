@@ -1,0 +1,24 @@
+services:
+  wine-finder:
+    build: .
+    container_name: wine-finder
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:///./data/app.db
+      APP_SECRET: ${APP_SECRET:-change-me}
+      USER_A_PASSWORD: ${USER_A_PASSWORD:-changeme-a}
+      USER_B_PASSWORD: ${USER_B_PASSWORD:-changeme-b}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      LLM_SEARCH_URL: ${LLM_SEARCH_URL:-}
+      LLM_EXTRACT_OFFERS_URL: ${LLM_EXTRACT_OFFERS_URL:-}
+      LLM_SUMMARIZE_REVIEWS_URL: ${LLM_SUMMARIZE_REVIEWS_URL:-}
+      LLM_MATCH_ENTITY_URL: ${LLM_MATCH_ENTITY_URL:-}
+      LLM_HEADERS_JSON: ${LLM_HEADERS_JSON:-{}}
+      LLM_TIMEOUT_SECONDS: ${LLM_TIMEOUT_SECONDS:-30}
+      MAX_PAGES_PER_STORE: ${MAX_PAGES_PER_STORE:-20}
+      MAX_LLM_CALLS_PER_RUN: ${MAX_LLM_CALLS_PER_RUN:-300}
+    volumes:
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+    restart: unless-stopped

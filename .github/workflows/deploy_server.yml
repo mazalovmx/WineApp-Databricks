@@ -1,0 +1,46 @@
+name: Deploy to Server
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate deployment files
+        run: |
+          test -f Dockerfile
+          test -f docker-compose.yml
+          test -f scripts/run_quality_pipeline.py
+
+      - name: Build container image
+        run: docker build -t guadalajara-wine-finder:latest .
+
+      - name: Deploy over SSH
+        if: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_USER != '' && secrets.DEPLOY_SSH_KEY != '' }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            mkdir -p ~/apps/guadalajara-wine-finder
+            cd ~/apps/guadalajara-wine-finder
+            if [ ! -d .git ]; then
+              git clone "${{ secrets.DEPLOY_REPO_URL }}" .
+            fi
+            git fetch origin main
+            git checkout main
+            git reset --hard origin/main
+            docker compose up -d --build
+
+      - name: Deployment skipped notice
+        if: ${{ secrets.DEPLOY_HOST == '' || secrets.DEPLOY_USER == '' || secrets.DEPLOY_SSH_KEY == '' }}
+        run: echo "Deploy step skipped: required secrets are not configured."

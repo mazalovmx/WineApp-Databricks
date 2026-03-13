@@ -56,6 +56,7 @@
 
 ### `WineHistoryDrawer`
 - Displays rating history timeline and comments for selected wine.
+- Includes per-entry delete action for owned ratings with confirm step.
 
 ## 1.4 Add Rating
 
@@ -78,9 +79,14 @@
 ### `LocaleSwitcher`
 - Values: `en`, `ru`
 - Must switch labels and generated explanation language requests.
+- Locale can be persisted for the current user from Settings page.
 
 ### `ManualRunButton`
 - Visible only when user has permission.
+- States: idle/loading/success/error.
+
+### `UserSettingsSaveButton`
+- Saves current locale to backend user profile.
 - States: idle/loading/success/error.
 
 ## 2. Shared Utilities
@@ -97,6 +103,7 @@
 ## 3. State Boundaries
 
 - Server state: recommendations, health, tried wines, ratings history.
+- Server state also includes user locale preference.
 - Client state: active tab, selected wine, locale, user.
 - Never duplicate server truth in multiple stores.
 
