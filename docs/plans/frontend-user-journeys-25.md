@@ -2,6 +2,10 @@
 
 This document describes 25 realistic user journeys and how current design/API supports each.
 
+Identity mapping for product:
+- `A` = Alexander
+- `B` = Elena
+
 ## A. Authentication and Session (1–5)
 
 1. Open app first time and see Home shell, login controls, tabs.
@@ -61,6 +65,8 @@ This document describes 25 realistic user journeys and how current design/API su
   - ratings/comments in `user_ratings` table,
   - user locale in `users.locale`,
   - recommendation outputs in run tables.
+- Isolation rule:
+  - user A and user B preferences are stored and read independently; no cross-user overwrite.
 - User deletion capability:
   - own rating deletion via `DELETE /ratings/{rating_id}`.
   - cross-user delete blocked by authorization.

@@ -27,8 +27,9 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 
 - Database URL: `sqlite:///./data/app.db`
 - Users:
-  - `A` / password from `USER_A_PASSWORD` (default `changeme-a`)
-  - `B` / password from `USER_B_PASSWORD` (default `changeme-b`)
+  - `A` (`Alexander`) / password from `USER_A_PASSWORD` (default `changeme-a`)
+  - `B` (`Elena`) / password from `USER_B_PASSWORD` (default `changeme-b`)
+- User preferences are isolated by user id (`A` and `B`) and persisted separately.
 
 ## Important project policies
 

@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 
+from app.config import settings
 from app.main import app
 
 
@@ -148,6 +149,33 @@ def test_user_settings_read_and_update() -> None:
         me = client.get("/users/me", headers=headers)
         assert me.status_code == 200
         assert me.json()["locale"] == "en"
+
+
+def test_user_preferences_are_saved_separately() -> None:
+    with TestClient(app) as client:
+        headers_a = _auth_headers(client, user_id="A", password="changeme-a")
+        headers_b = _auth_headers(client, user_id="B", password="changeme-b")
+
+        set_a = client.patch("/users/me/settings", headers=headers_a, json={"locale": "ru"})
+        set_b = client.patch("/users/me/settings", headers=headers_b, json={"locale": "en"})
+        assert set_a.status_code == 200
+        assert set_b.status_code == 200
+
+        get_a = client.get("/users/me/settings", headers=headers_a)
+        get_b = client.get("/users/me/settings", headers=headers_b)
+        assert get_a.status_code == 200
+        assert get_b.status_code == 200
+        assert get_a.json()["locale"] == "ru"
+        assert get_b.json()["locale"] == "en"
+
+        me_a = client.get("/users/me", headers=headers_a)
+        me_b = client.get("/users/me", headers=headers_b)
+        assert me_a.status_code == 200
+        assert me_b.status_code == 200
+        assert me_a.json()["id"] == "A"
+        assert me_b.json()["id"] == "B"
+        assert me_a.json()["display_name"] == settings.user_a_display_name
+        assert me_b.json()["display_name"] == settings.user_b_display_name
 
 
 def test_user_can_delete_own_rating_but_not_other_user_rating() -> None:

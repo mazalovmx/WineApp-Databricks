@@ -81,8 +81,8 @@ def ensure_default_users(session: Session) -> None:
     salt_a = os.getenv("USER_A_SALT", "salt-a")
     salt_b = os.getenv("USER_B_SALT", "salt-b")
     expected = {
-        "A": ("User A", "en", hash_password(settings.user_a_password, salt_a)),
-        "B": ("User B", "ru", hash_password(settings.user_b_password, salt_b)),
+        "A": (settings.user_a_display_name, "en", hash_password(settings.user_a_password, salt_a)),
+        "B": (settings.user_b_display_name, "ru", hash_password(settings.user_b_password, salt_b)),
     }
     for user_id, (name, locale, pwd_hash) in expected.items():
         row = session.get(User, user_id)
@@ -96,8 +96,10 @@ def ensure_default_users(session: Session) -> None:
                 )
             )
         else:
+            # Preserve user-managed locale preference across restarts.
             row.display_name = name
-            row.locale = locale
+            if row.locale not in {"en", "ru"}:
+                row.locale = locale
             row.password_hash = pwd_hash
     session.commit()
 

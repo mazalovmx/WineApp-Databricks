@@ -78,6 +78,8 @@
       saveSettings: "Save User Settings",
       settingsSaved: "User settings saved.",
       loginHelp: "Login is required for recommendations, tried wines, and ratings.",
+      userALabel: "A — Alexander",
+      userBLabel: "B — Elena",
       delete: "Delete",
       deleteConfirm: "Delete this rating?",
       userSettings: "User Configuration",
@@ -156,6 +158,8 @@
       saveSettings: "Сохранить настройки пользователя",
       settingsSaved: "Настройки пользователя сохранены.",
       loginHelp: "Для рекомендаций, оценок и истории нужен вход.",
+      userALabel: "A — Александр",
+      userBLabel: "B — Елена",
       delete: "Удалить",
       deleteConfirm: "Удалить эту оценку?",
       userSettings: "Конфигурация пользователя",
@@ -592,8 +596,8 @@
             <div class="toolbar-group">
               <label for="activeUserSelect">${escapeHtml(t("activeUser"))}</label>
               <select id="activeUserSelect">
-                <option value="A" ${state.activeUser === "A" ? "selected" : ""}>A</option>
-                <option value="B" ${state.activeUser === "B" ? "selected" : ""}>B</option>
+                <option value="A" ${state.activeUser === "A" ? "selected" : ""}>${escapeHtml(t("userALabel"))}</option>
+                <option value="B" ${state.activeUser === "B" ? "selected" : ""}>${escapeHtml(t("userBLabel"))}</option>
               </select>
             </div>
             <div class="toolbar-group">

@@ -81,5 +81,16 @@ def test_ensure_default_users_updates_existing_rows() -> None:
         ensure_default_users(session)
         updated = session.get(User, "A")
         assert updated is not None
-        assert updated.display_name == "User A"
-        assert updated.locale == "en"
+        assert updated.display_name == settings.user_a_display_name
+        assert updated.locale == "ru"
+
+
+def test_default_users_have_product_display_names() -> None:
+    with Session(engine) as session:
+        ensure_default_users(session)
+        user_a = session.get(User, "A")
+        user_b = session.get(User, "B")
+        assert user_a is not None
+        assert user_b is not None
+        assert user_a.display_name == settings.user_a_display_name
+        assert user_b.display_name == settings.user_b_display_name

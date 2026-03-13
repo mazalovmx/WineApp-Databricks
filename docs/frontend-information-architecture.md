@@ -3,6 +3,8 @@
 ## 1. Product Truths (Non-Negotiable)
 
 1. App serves exactly two identities: `A` and `B`.
+   - `A`: Alexander
+   - `B`: Elena
 2. Geography scope is Guadalajara, Jalisco sources only.
 3. Main outcomes are:
    - `Recommended Buys` (new wines for user, value-focused).

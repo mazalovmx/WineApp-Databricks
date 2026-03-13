@@ -9,6 +9,8 @@ from pathlib import Path
 class Settings:
     database_url: str = os.getenv("DATABASE_URL", "sqlite:///./data/app.db")
     app_secret: str = os.getenv("APP_SECRET", "dev-secret-change-me")
+    user_a_display_name: str = os.getenv("USER_A_DISPLAY_NAME", "Alexander")
+    user_b_display_name: str = os.getenv("USER_B_DISPLAY_NAME", "Elena")
     user_a_password: str = os.getenv("USER_A_PASSWORD", "changeme-a")
     user_b_password: str = os.getenv("USER_B_PASSWORD", "changeme-b")
     artifacts_root: Path = Path(os.getenv("ARTIFACTS_ROOT", "artifacts"))
