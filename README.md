@@ -43,3 +43,7 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 - `docs/frontend-api-contract.md`
 - `docs/frontend-design-tokens.md`
 - `docs/frontend-acceptance-checklists.md`
+
+## Testing docs
+
+- `docs/testing.md`

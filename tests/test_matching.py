@@ -19,3 +19,12 @@ def test_match_listed_wine_returns_confident_match() -> None:
     )
     assert result.wine_id == 1
     assert result.confidence >= 0.85
+
+
+def test_match_listed_wine_returns_none_for_unrelated_candidates() -> None:
+    result = match_listed_wine(
+        "Agave Spirit Reposado",
+        [(1, "Casillero Cabernet"), (2, "Trapiche Malbec")],
+    )
+    assert result.wine_id is None
+    assert result.reason == "low_confidence"
