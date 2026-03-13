@@ -280,6 +280,21 @@
     }>${escapeHtml(label)}</a>`;
   }
 
+  function skeletonRecommendationList(count) {
+    return Array.from({ length: count })
+      .map(
+        () => `
+          <article class="skeleton-card" aria-hidden="true">
+            <div class="skeleton skeleton-line" style="width: 45%;"></div>
+            <div class="skeleton skeleton-line" style="width: 80%;"></div>
+            <div class="skeleton skeleton-line" style="width: 60%;"></div>
+            <div class="skeleton skeleton-line" style="width: 90%;"></div>
+          </article>
+        `
+      )
+      .join("");
+  }
+
   function recommendationCards(items) {
     if (!items.length) return `<p class="muted">${escapeHtml(t("noRecommendations"))}</p>`;
     return items
@@ -297,6 +312,7 @@
             <div class="recommendation-meta">
               <span><strong>${escapeHtml(t("recommendationRank"))}:</strong> ${escapeHtml(item.rank)}</span>
               <span><strong>${escapeHtml(t("recommendationWine"))}:</strong> #${escapeHtml(item.wine_id)}</span>
+              <span><strong>${escapeHtml(t("recommendationOffer"))}:</strong> ${escapeHtml(item.offer_id || t("unknown"))}</span>
               <span><strong>${escapeHtml(t("recommendationScore"))}:</strong> ${escapeHtml(item.score.toFixed(3))}</span>
               <span><strong>${escapeHtml(t("recommendationPrice"))}:</strong> ${escapeHtml(t("unknown"))}</span>
             </div>
@@ -357,20 +373,20 @@
       </section>
       <section class="panel">
         <h2>${escapeHtml(t("recommendedBuys"))}</h2>
-        <div class="recommendation-list">
+        <div class="recommendation-list" aria-busy="${state.loading.recommended ? "true" : "false"}">
           ${
             state.loading.recommended
-              ? `<p class="muted">${escapeHtml(t("loading"))}</p>`
+              ? skeletonRecommendationList(3)
               : recommendationCards(state.recommended)
           }
         </div>
       </section>
       <section class="panel">
         <h2>${escapeHtml(t("cheapestFavorites"))}</h2>
-        <div class="recommendation-list">
+        <div class="recommendation-list" aria-busy="${state.loading.favorites ? "true" : "false"}">
           ${
             state.loading.favorites
-              ? `<p class="muted">${escapeHtml(t("loading"))}</p>`
+              ? skeletonRecommendationList(2)
               : recommendationCards(state.favorites)
           }
         </div>
@@ -560,7 +576,12 @@
             </div>
             <div class="toolbar-group">
               <label for="passwordInput">${escapeHtml(t("password"))}</label>
-              <input id="passwordInput" type="password" value="${escapeHtml(state.loginPassword)}" />
+              <input
+                id="passwordInput"
+                type="password"
+                autocomplete="current-password"
+                value="${escapeHtml(state.loginPassword)}"
+              />
               ${
                 state.token && state.me
                   ? `<button class="button button-secondary" data-action="logout">${escapeHtml(t("logout"))}</button>`
@@ -590,7 +611,9 @@
         </header>
 
         <main class="main-grid">${renderContent()}</main>
-        <p class="aria-live" aria-live="polite">${escapeHtml(state.status.text)}</p>
+        <p class="aria-live ${escapeHtml(state.status.type || "status-no_data")}" aria-live="polite" role="status">
+          ${escapeHtml(state.status.text)}
+        </p>
       </div>
     `;
   }
