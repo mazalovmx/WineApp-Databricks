@@ -47,3 +47,7 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 ## Testing docs
 
 - `docs/testing.md`
+
+## Demo data docs
+
+- `docs/demo-data.md`
