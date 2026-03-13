@@ -1,0 +1,23 @@
+Summarize the following wine reviews into structured JSON. Handle conflicting opinions explicitly.
+
+Output ONLY valid JSON. Use "unknown" for unknown values. Include confidence (0-1) where applicable.
+
+Schema:
+{
+  "avg_rating": number or null (normalize to 1-5 scale if different),
+  "rating_scale": "1-5" | "1-10" | "unknown",
+  "descriptors": [
+    {"tag": "string", "confidence": 0.0-1.0}
+  ],
+  "pros": ["string"],
+  "cons": ["string"],
+  "disagreement_summary": "text explaining where opinions differ, or null if consistent",
+  "confidence": 0.0-1.0
+}
+
+Review texts:
+---
+{review_texts}
+---
+
+JSON only, no markdown:

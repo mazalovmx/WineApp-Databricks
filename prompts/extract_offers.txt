@@ -1,0 +1,25 @@
+Extract wine offers from the following page content. The page is from a wine/alcohol store in Guadalajara, Jalisco, Mexico.
+
+Output ONLY valid JSON matching this schema. Use "unknown" for unknown values. Include confidence (0-1) for each offer.
+
+Schema:
+{
+  "offers": [
+    {
+      "listed_name": "exact product name as shown",
+      "price_mxn": number (Mexican pesos),
+      "discount_text": "discount text if visible, else null",
+      "volume_ml": bottle size in ml if shown, else null,
+      "availability": "in_stock" | "out_of_stock" | "unknown",
+      "product_url": "full URL if available, else null",
+      "confidence": 0.0-1.0
+    }
+  ]
+}
+
+Page content:
+---
+{page_text}
+---
+
+JSON only, no markdown:

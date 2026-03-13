@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["offers"],
+  "properties": {
+    "offers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["listed_name", "price_mxn"],
+        "properties": {
+          "listed_name": {"type": "string"},
+          "price_mxn": {"type": "number"},
+          "discount_text": {"type": ["string", "null"]},
+          "volume_ml": {"type": ["integer", "null"]},
+          "availability": {"type": "string", "enum": ["in_stock", "out_of_stock", "unknown"]},
+          "product_url": {"type": ["string", "null"]},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    }
+  }
+}

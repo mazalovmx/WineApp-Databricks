@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+.nuxt/
+out/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Artifacts (NEVER commit)
+artifacts/
+logs/
+raw_pages/
+data/
+!data/sources.json
+*.html
+*.json.gz
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Database
+*.db
+*.sqlite3
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db

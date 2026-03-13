@@ -1,0 +1,15 @@
+Match the listed product name to one of the candidate wines, or return null if no good match.
+
+Output ONLY valid JSON:
+{
+  "match_id": candidate id if matched, else null,
+  "confidence": 0.0-1.0,
+  "reason": "brief reason for match or non-match"
+}
+
+Listed product name: {listed_name}
+
+Candidates (id, canonical_name, producer):
+{candidates_json}
+
+JSON only, no markdown:
