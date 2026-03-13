@@ -78,6 +78,10 @@ Run tests with coverage report:
 
 - `python3 -m pytest -q --cov=app --cov-report=term-missing`
 
+Run full quality pipeline (with persisted step logs):
+
+- `python3 scripts/run_quality_pipeline.py --base-ref HEAD~1`
+
 Run a focused module:
 
 - `python3 -m pytest -q tests/test_api.py`
@@ -91,3 +95,4 @@ Before merging:
 2. Tests pass.
 3. Coverage report is reviewed for regressions in modified modules.
 4. Documentation is updated when test scope or behavior changes.
+5. Quality pipeline logs are stored for review in `artifacts/test_runs/<run_id>/`.

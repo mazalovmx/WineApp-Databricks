@@ -47,7 +47,20 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 ## Testing docs
 
 - `docs/testing.md`
+- `docs/plans/testing-issue-hunt-plan.md`
 
 ## Demo data docs
 
 - `docs/demo-data.md`
+
+## Repository hygiene and docs-as-code
+
+- `docs/plans/repository-hygiene-plan.md`
+- `docs/policies/docs-as-code.md`
+- `docs/one_time/README.md`
+
+Quality/doc enforcement scripts:
+
+- `python3 scripts/repo_hygiene_check.py`
+- `python3 scripts/docs_guard.py --base-ref HEAD~1`
+- `python3 scripts/run_quality_pipeline.py --base-ref HEAD~1`

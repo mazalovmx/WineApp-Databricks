@@ -1,0 +1,43 @@
+name: Quality Pipeline
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "cursor/**"
+      - "python-no-databricks"
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Fetch main for docs diff baseline
+        run: git fetch origin main
+
+      - name: Run quality pipeline
+        run: python3 scripts/run_quality_pipeline.py --base-ref origin/main --pytest-retries 1
+
+      - name: Upload quality artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-artifacts
+          path: |
+            artifacts/test_runs/**
+            artifacts/quality_checks/**
