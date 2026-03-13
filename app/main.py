@@ -14,20 +14,19 @@ from sqlalchemy.orm import Session
 from app.auth import AuthUser, authenticate_user, ensure_default_users, get_current_user, make_token
 from app.config import settings
 from app.db import Base, engine, get_session
-from app.models import Offer, Recommendation, RecommendationRun, ReviewAggregate, User, UserRating, Wine
+from app.models import Offer, Recommendation, RecommendationRun, User, UserRating, Wine
 from app.pipeline import latest_run_query, run_pipeline
 from app.schemas import (
     HealthResponse,
     LoginRequest,
     LoginResponse,
     RatingCreateRequest,
-    RecommendationsResponse,
     RecommendationItem,
+    RecommendationsResponse,
     TriedWineItem,
     TriggerRunRequest,
     UserMeResponse,
 )
-
 
 app = FastAPI(title="Guadalajara Wine Finder", version="0.1.0")
 app.add_middleware(

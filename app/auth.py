@@ -16,7 +16,6 @@ from app.config import settings
 from app.db import get_session
 from app.models import User
 
-
 TOKEN_TTL_SECONDS = 60 * 60 * 24 * 14
 security = HTTPBearer(auto_error=False)
 
@@ -34,7 +33,7 @@ def make_token(user_id: str) -> str:
     now = int(time.time())
     payload = f"{user_id}:{now}"
     signature = hmac.new(settings.app_secret.encode("utf-8"), payload.encode("utf-8"), "sha256").hexdigest()
-    token = base64.urlsafe_b64encode(f"{payload}:{signature}".encode("utf-8")).decode("ascii")
+    token = base64.urlsafe_b64encode(f"{payload}:{signature}".encode()).decode("ascii")
     return token
 
 
@@ -48,7 +47,7 @@ def parse_token(token: str) -> str:
 
     expected_sig = hmac.new(
         settings.app_secret.encode("utf-8"),
-        f"{user_id}:{ts}".encode("utf-8"),
+        f"{user_id}:{ts}".encode(),
         "sha256",
     ).hexdigest()
     if not hmac.compare_digest(signature, expected_sig):

@@ -10,5 +10,6 @@ venv/
 data/
 artifacts/
 *.log
+*.egg-info/
 
 .DS_Store
