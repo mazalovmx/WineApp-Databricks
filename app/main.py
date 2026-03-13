@@ -22,6 +22,7 @@ from app.schemas import (
     LoginResponse,
     RatingCreateRequest,
     RecommendationItem,
+    RatingHistoryItem,
     RecommendationsResponse,
     TriedWineItem,
     TriggerRunRequest,
@@ -222,12 +223,12 @@ def tried_wines(
                 last_known_offer_price=float(latest_offer.price_mxn) if latest_offer else None,
             )
         grouped[wine.id].ratings.append(
-            {
-                "rating_id": rating.id,
-                "rating_1_5": rating.rating_1_5,
-                "comment": rating.comment,
-                "tried_at": rating.tried_at.isoformat(),
-            }
+            RatingHistoryItem(
+                rating_id=rating.id,
+                rating_1_5=rating.rating_1_5,
+                comment=rating.comment,
+                tried_at=rating.tried_at,
+            )
         )
     return list(grouped.values())
 
