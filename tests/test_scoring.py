@@ -98,4 +98,4 @@ def test_build_explanation_includes_conflict_and_locale() -> None:
     assert "mixed finish ratings" in en
     assert "MXN" in en
     assert "вкусового профиля" in ru
-    assert "MXN" not in ru
+    assert "Выгодная цена" in ru
