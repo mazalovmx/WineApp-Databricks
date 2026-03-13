@@ -35,3 +35,11 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 - Logs, raw pages, and generated artifacts are ignored by git
 - Prompt templates are versioned in `prompts/`
 - JSON contracts are versioned in `schemas/`
+
+## Frontend companion docs
+
+- `docs/frontend-information-architecture.md`
+- `docs/frontend-component-spec.md`
+- `docs/frontend-api-contract.md`
+- `docs/frontend-design-tokens.md`
+- `docs/frontend-acceptance-checklists.md`
