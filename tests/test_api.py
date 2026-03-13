@@ -49,3 +49,11 @@ def test_rating_submission_and_tried_search() -> None:
         assert tried.status_code == 200
         body = tried.json()
         assert any(item["wine_id"] == wine_id for item in body)
+
+
+def test_frontend_routes_serve_html() -> None:
+    with TestClient(app) as client:
+        for path in ["/", "/tried", "/ratings/new", "/settings"]:
+            response = client.get(path)
+            assert response.status_code == 200
+            assert "text/html" in response.headers["content-type"]

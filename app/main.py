@@ -52,6 +52,21 @@ def root() -> FileResponse:
     return FileResponse("app/static/index.html")
 
 
+@app.get("/tried", include_in_schema=False)
+def tried_page() -> FileResponse:
+    return FileResponse("app/static/index.html")
+
+
+@app.get("/ratings/new", include_in_schema=False)
+def add_rating_page() -> FileResponse:
+    return FileResponse("app/static/index.html")
+
+
+@app.get("/settings", include_in_schema=False)
+def settings_page() -> FileResponse:
+    return FileResponse("app/static/index.html")
+
+
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 
