@@ -29,6 +29,7 @@ from app.models import (
 )
 from app.schema_validation import load_schema, validate_json
 from app.scoring import ScoringInput, build_explanation, score_offer
+from app.time_utils import utc_now_compact, utc_now_naive
 
 
 @dataclass(slots=True)
@@ -41,7 +42,7 @@ class PipelineResult:
 def _ensure_dirs(run_id: str) -> tuple[Path, Path]:
     run_dir = settings.artifacts_root / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
-    raw_dir = settings.artifacts_root / "raw_pages" / datetime.utcnow().strftime("%Y-%m")
+    raw_dir = settings.artifacts_root / "raw_pages" / utc_now_naive().strftime("%Y-%m")
     raw_dir.mkdir(parents=True, exist_ok=True)
     return run_dir, raw_dir
 
@@ -402,9 +403,9 @@ def _write_recommendations(session: Session, run_id: str) -> int:
 
 def run_pipeline(session: Session, mode: str, llm: LLMClient | None = None) -> PipelineResult:
     llm = llm or MockLLMClient()
-    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%S") + "-" + uuid.uuid4().hex[:8]
+    run_id = utc_now_compact() + "-" + uuid.uuid4().hex[:8]
     run_dir, raw_dir = _ensure_dirs(run_id)
-    started_at = datetime.utcnow()
+    started_at = utc_now_naive()
     run = RecommendationRun(
         id=run_id,
         mode=mode,
@@ -457,7 +458,7 @@ def run_pipeline(session: Session, mode: str, llm: LLMClient | None = None) -> P
         run.status = "fail"
         raise
     finally:
-        run.finished_at = datetime.utcnow()
+        run.finished_at = utc_now_naive()
         summary["finished_at"] = run.finished_at.isoformat()
         summary_path = Path(run.logs_ref)
         summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")

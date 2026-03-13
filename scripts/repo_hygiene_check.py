@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 import subprocess
-from datetime import datetime
 from pathlib import Path
 
 from app.quality import TRACKED_RUNTIME_DIRS, ensure_artifact_dir
+from app.time_utils import utc_now_compact, utc_now_iso
 
 TOP_LEVEL_ALLOWED = {
     ".github",
@@ -85,13 +85,13 @@ def main() -> None:
     }
 
     payload = {
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now_iso(),
         "checks": checks,
         "status": "pass" if not failures else "fail",
     }
 
     out_dir = ensure_artifact_dir("quality_checks")
-    out_path = out_dir / f"repo_hygiene_{datetime.utcnow().strftime('%Y%m%dT%H%M%S')}.json"
+    out_path = out_dir / f"repo_hygiene_{utc_now_compact()}.json"
     out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     print(f"repo-hygiene status={payload['status']} report={out_path}")

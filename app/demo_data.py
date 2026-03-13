@@ -18,6 +18,7 @@ from app.models import (
     Wine,
 )
 from app.pipeline import run_pipeline
+from app.time_utils import utc_now_naive
 
 DEMO_STORE_PREFIX = "Demo Store"
 DEMO_WINE_PREFIX = "Demo Wine"
@@ -150,7 +151,7 @@ def seed_demo_data(
     if reset:
         _reset_demo_data(session)
     stores = _ensure_demo_stores(session)
-    now = datetime.utcnow()
+    now = utc_now_naive()
 
     ratings_a = 0
     ratings_b = 0

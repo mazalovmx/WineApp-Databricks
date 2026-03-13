@@ -3,9 +3,9 @@ from __future__ import annotations
 import argparse
 import json
 import subprocess
-from datetime import datetime
 
 from app.quality import ensure_artifact_dir, evaluate_docs_policy
+from app.time_utils import utc_now_compact, utc_now_iso
 
 
 def _run_git_command(args: list[str]) -> str:
@@ -59,14 +59,14 @@ def main() -> None:
     payload = {
         "base_ref": args.base_ref,
         "head_ref": args.head_ref,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now_iso(),
         "changed_files": changed,
         "numstat": {k: {"added": v[0], "deleted": v[1]} for k, v in diff_numstat.items()},
         "policy": result.to_dict(),
     }
 
     out_dir = ensure_artifact_dir("quality_checks")
-    out_path = out_dir / f"docs_guard_{datetime.utcnow().strftime('%Y%m%dT%H%M%S')}.json"
+    out_path = out_dir / f"docs_guard_{utc_now_compact()}.json"
     out_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
     print(

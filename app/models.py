@@ -17,6 +17,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
+from app.time_utils import utc_now_naive
 
 
 class User(Base):
@@ -26,7 +27,7 @@ class User(Base):
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     locale: Mapped[str] = mapped_column(String(8), default="en", nullable=False)
     password_hash: Mapped[str] = mapped_column(String(256), nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
 
 
 class Store(Base):
@@ -51,9 +52,9 @@ class Wine(Base):
     grapes: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     sweetness: Mapped[str] = mapped_column(String(32), default="unknown", nullable=False)
     is_grape_wine: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now_naive, onupdate=utc_now_naive, nullable=False
     )
 
 
@@ -69,7 +70,7 @@ class Offer(Base):
     volume_ml: Mapped[int | None] = mapped_column(Integer, nullable=True)
     availability: Mapped[str] = mapped_column(String(32), default="unknown", nullable=False)
     product_url: Mapped[str] = mapped_column(String(2048), nullable=False)
-    captured_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
     match_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
 
 
@@ -80,7 +81,7 @@ class PriceHistory(Base):
     wine_id: Mapped[int] = mapped_column(ForeignKey("wines.id"), nullable=False)
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"), nullable=False)
     price_mxn: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
-    captured_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    captured_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
 
 
 class RawPage(Base):
@@ -90,7 +91,7 @@ class RawPage(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     store_id: Mapped[int] = mapped_column(ForeignKey("stores.id"), nullable=False)
     url: Mapped[str] = mapped_column(String(2048), nullable=False)
-    fetched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
     content_ref: Mapped[str] = mapped_column(String(2048), nullable=False)
     content_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     fetch_status: Mapped[str] = mapped_column(String(64), nullable=False, default="success")
@@ -103,7 +104,7 @@ class ExternalReview(Base):
     wine_id: Mapped[int] = mapped_column(ForeignKey("wines.id"), nullable=False)
     source_name: Mapped[str] = mapped_column(String(255), nullable=False)
     source_url: Mapped[str] = mapped_column(String(2048), nullable=False)
-    fetched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    fetched_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
     raw_ref: Mapped[str] = mapped_column(String(2048), nullable=False)
     extracted_json: Mapped[dict[str, object]] = mapped_column(JSON, nullable=False)
 
@@ -119,7 +120,7 @@ class ReviewAggregate(Base):
     cons: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
     disagreement_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+        DateTime, default=utc_now_naive, onupdate=utc_now_naive, nullable=False
     )
 
 
@@ -132,7 +133,7 @@ class UserRating(Base):
     rating_1_5: Mapped[int] = mapped_column(Integer, nullable=False)
     comment: Mapped[str | None] = mapped_column(Text, nullable=True)
     tried_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
 
 
 class RecommendationRun(Base):
@@ -140,7 +141,7 @@ class RecommendationRun(Base):
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)  # run_id
     mode: Mapped[str] = mapped_column(String(16), nullable=False)  # daily/weekly/manual
-    started_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     status: Mapped[str] = mapped_column(String(16), nullable=False)  # success/fail
     logs_ref: Mapped[str] = mapped_column(String(2048), nullable=False)
@@ -160,7 +161,7 @@ class Recommendation(Base):
     score: Mapped[float] = mapped_column(Float, nullable=False)
     explanation: Mapped[str] = mapped_column(Text, nullable=False)
     explanation_locale: Mapped[str] = mapped_column(String(8), nullable=False, default="en")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)
 
 
 class InteractionEvent(Base):
@@ -170,4 +171,4 @@ class InteractionEvent(Base):
     user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     event_type: Mapped[str] = mapped_column(String(64), nullable=False)
     payload: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utc_now_naive, nullable=False)

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
 from app.db import engine
 from app.models import RecommendationRun, ReviewAggregate, UserRating, Wine
 from app.pipeline import _descriptor_match, latest_run_query
+from app.time_utils import utc_now_naive
 
 
 def _add_wine(session: Session, name: str) -> Wine:
@@ -34,7 +35,7 @@ def test_descriptor_match_uses_overlap_and_fallback_paths() -> None:
                 wine_id=liked.id,
                 rating_1_5=5,
                 comment="liked",
-                tried_at=datetime.utcnow(),
+                tried_at=utc_now_naive(),
             )
         )
         session.commit()
@@ -95,16 +96,16 @@ def test_latest_run_query_filters_success() -> None:
                 RecommendationRun(
                     id="run-failed",
                     mode="manual",
-                    started_at=datetime.utcnow() - timedelta(minutes=2),
-                    finished_at=datetime.utcnow() - timedelta(minutes=1),
+                    started_at=utc_now_naive() - timedelta(minutes=2),
+                    finished_at=utc_now_naive() - timedelta(minutes=1),
                     status="fail",
                     logs_ref="artifacts/run-failed/run_summary.json",
                 ),
                 RecommendationRun(
                     id="run-success",
                     mode="manual",
-                    started_at=datetime.utcnow() - timedelta(minutes=1),
-                    finished_at=datetime.utcnow(),
+                    started_at=utc_now_naive() - timedelta(minutes=1),
+                    finished_at=utc_now_naive(),
                     status="success",
                     logs_ref="artifacts/run-success/run_summary.json",
                 ),

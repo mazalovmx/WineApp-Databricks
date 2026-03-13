@@ -4,10 +4,10 @@ import argparse
 import json
 import subprocess
 from dataclasses import asdict, dataclass
-from datetime import datetime
 from pathlib import Path
 
 from app.quality import ensure_artifact_dir
+from app.time_utils import utc_now_compact, utc_now_iso
 
 
 @dataclass(slots=True)
@@ -41,14 +41,14 @@ def _run_step(
 ) -> StepResult:
     attempts: list[StepAttempt] = []
     for attempt in range(1, max_attempts + 1):
-        started = datetime.utcnow().isoformat()
+        started = utc_now_iso()
         completed = subprocess.run(
             command,
             shell=True,
             capture_output=True,
             text=True,
         )
-        finished = datetime.utcnow().isoformat()
+        finished = utc_now_iso()
 
         log_path = run_dir / f"{name}_attempt_{attempt}.log"
         text = "\n".join(
@@ -85,7 +85,7 @@ def main() -> None:
     parser.add_argument("--pytest-retries", type=int, default=1)
     args = parser.parse_args()
 
-    run_id = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+    run_id = utc_now_compact()
     run_root = ensure_artifact_dir("test_runs")
     run_dir = run_root / run_id
     run_dir.mkdir(parents=True, exist_ok=True)
@@ -114,8 +114,8 @@ def main() -> None:
     failed = [step for step in results if not step.success]
     summary = {
         "run_id": run_id,
-        "started_at": results[0].attempts[0].started_at if results else datetime.utcnow().isoformat(),
-        "finished_at": datetime.utcnow().isoformat(),
+        "started_at": results[0].attempts[0].started_at if results else utc_now_iso(),
+        "finished_at": utc_now_iso(),
         "status": "success" if not failed else "fail",
         "steps": [
             {

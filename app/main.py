@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated
@@ -27,8 +28,20 @@ from app.schemas import (
     TriggerRunRequest,
     UserMeResponse,
 )
+from app.time_utils import utc_now_naive
 
-app = FastAPI(title="Guadalajara Wine Finder", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    Path("data").mkdir(parents=True, exist_ok=True)
+    settings.artifacts_root.mkdir(parents=True, exist_ok=True)
+    Base.metadata.create_all(bind=engine)
+    with Session(engine) as session:
+        ensure_default_users(session)
+    yield
+
+
+app = FastAPI(title="Guadalajara Wine Finder", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -36,15 +49,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def startup() -> None:
-    Path("data").mkdir(parents=True, exist_ok=True)
-    settings.artifacts_root.mkdir(parents=True, exist_ok=True)
-    Base.metadata.create_all(bind=engine)
-    with Session(engine) as session:
-        ensure_default_users(session)
 
 
 @app.get("/", include_in_schema=False)
@@ -75,7 +79,7 @@ def health(session: Session = Depends(get_session)) -> HealthResponse:
     run = session.execute(latest_run_query(success_only=True)).scalars().first()
     if run is None:
         return HealthResponse(status="ok", last_successful_run=None, data_freshness="no_successful_runs_yet")
-    freshness = "fresh" if (datetime.utcnow() - run.finished_at).total_seconds() < 60 * 60 * 30 else "stale"
+    freshness = "fresh" if (utc_now_naive() - run.finished_at).total_seconds() < 60 * 60 * 30 else "stale"
     return HealthResponse(status="ok", last_successful_run=run.finished_at, data_freshness=freshness)
 
 
@@ -213,7 +217,7 @@ def add_rating(
         wine_id=payload.wine_id,
         rating_1_5=payload.rating_1_5,
         comment=payload.comment,
-        tried_at=payload.tried_at or datetime.utcnow(),
+        tried_at=payload.tried_at or utc_now_naive(),
     )
     session.add(row)
     session.commit()
