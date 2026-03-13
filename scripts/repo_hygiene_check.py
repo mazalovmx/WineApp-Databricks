@@ -8,10 +8,13 @@ from app.quality import TRACKED_RUNTIME_DIRS, ensure_artifact_dir
 from app.time_utils import utc_now_compact, utc_now_iso
 
 TOP_LEVEL_ALLOWED = {
+    ".dockerignore",
     ".github",
     ".env.example",
     ".gitignore",
+    "Dockerfile",
     "README.md",
+    "docker-compose.yml",
     "pyproject.toml",
     "app",
     "docs",

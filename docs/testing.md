@@ -42,6 +42,7 @@ End-to-end API and pipeline behavior:
   - protected endpoint authorization
   - recommendations flow with manual run
   - rating submit + tried wines query
+  - typed rating history payload with `rating_id` for UI deletion actions
   - rating delete ownership constraints
   - user settings read/update persistence
   - favorites population after rating + rerun
