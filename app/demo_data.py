@@ -262,9 +262,17 @@ def seed_demo_data(
         run_result = run_pipeline(session, mode="manual")
         run_id = run_result.run_id
 
-    demo_wines = session.execute(select(Wine).where(Wine.canonical_name.like(f"{DEMO_WINE_PREFIX}%"))).scalars().all()
+    demo_wines = (
+        session.execute(select(Wine).where(Wine.canonical_name.like(f"{DEMO_WINE_PREFIX}%")))
+        .scalars()
+        .all()
+    )
     demo_offers = (
-        session.execute(select(Offer).join(Wine, Wine.id == Offer.wine_id).where(Wine.canonical_name.like(f"{DEMO_WINE_PREFIX}%")))
+        session.execute(
+            select(Offer)
+            .join(Wine, Wine.id == Offer.wine_id)
+            .where(Wine.canonical_name.like(f"{DEMO_WINE_PREFIX}%"))
+        )
         .scalars()
         .all()
     )
