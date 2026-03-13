@@ -19,6 +19,9 @@ This is the execution plan for finding backend and UI issues systematically.
 
 ## 2) UI issue-hunt plan (manual)
 
+0. Run automated UI smoke baseline first:
+   - `python3 scripts/run_ui_issue_hunt.py`
+
 1. Start server:
    - `python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000`
 2. Verify flows for user A and B:
@@ -33,6 +36,9 @@ This is the execution plan for finding backend and UI issues systematically.
 4. Capture artifacts:
    - one demo video
    - key screenshots (home, tried, settings)
+5. Review automated UI hunt logs:
+   - `artifacts/test_runs/<run_id>/ui_issue_hunt_summary.json`
+   - `artifacts/test_runs/<run_id>/ui_issue_hunt.log`
 
 ## 3) Defect triage
 

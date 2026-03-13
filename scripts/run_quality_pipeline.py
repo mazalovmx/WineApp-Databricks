@@ -98,6 +98,7 @@ def main() -> None:
             1,
         ),
         ("lint", "python3 -m ruff check app tests scripts", 1),
+        ("ui_issue_hunt", f"python3 scripts/run_ui_issue_hunt.py --run-id {run_id}", 1),
         ("tests", "python3 -m pytest -q", max(args.pytest_retries, 1)),
         (
             "coverage",

@@ -82,6 +82,10 @@ Run full quality pipeline (with persisted step logs):
 
 - `python3 scripts/run_quality_pipeline.py --base-ref HEAD~1`
 
+Run standalone UI issue-hunt smoke checks:
+
+- `python3 scripts/run_ui_issue_hunt.py`
+
 Run a focused module:
 
 - `python3 -m pytest -q tests/test_api.py`

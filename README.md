@@ -64,3 +64,4 @@ Quality/doc enforcement scripts:
 - `python3 scripts/repo_hygiene_check.py`
 - `python3 scripts/docs_guard.py --base-ref HEAD~1`
 - `python3 scripts/run_quality_pipeline.py --base-ref HEAD~1`
+- `python3 scripts/run_ui_issue_hunt.py`
