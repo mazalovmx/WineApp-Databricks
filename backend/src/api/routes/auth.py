@@ -23,8 +23,8 @@ class TokenResponse(BaseModel):
 def login(req: LoginRequest):
     """Minimal auth: user_id A or B with password from env."""
     import os
-    pw_a = os.getenv("USER_A_PASSWORD", "user_a")
-    pw_b = os.getenv("USER_B_PASSWORD", "user_b")
+    pw_a = os.getenv("USER_A_PASSWORD", "xK9mN2pQ7sL4vY8w")
+    pw_b = os.getenv("USER_B_PASSWORD", "aB3cD6eF9gH2jK5mN")
     expected = pw_a if req.user_id.upper() == "A" else (pw_b if req.user_id.upper() == "B" else None)
     if expected is None:
         raise HTTPException(status_code=400, detail="Invalid user_id")

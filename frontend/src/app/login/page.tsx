@@ -80,7 +80,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-4 text-sm text-stone-500">
-          Default: User A / user_a, User B / user_b
+          Passwords from USER_A_PASSWORD / USER_B_PASSWORD in backend .env
         </p>
       </main>
     </div>

@@ -67,14 +67,13 @@ npm install
 NEXT_PUBLIC_API_URL=http://localhost:8000 npm run dev
 ```
 
-### Default Auth (MVP)
+### Auth (User A & B)
 
-- User A: password `user_a` (or `USER_A_PASSWORD` env)
-- User B: password `user_b` (or `USER_B_PASSWORD` env)
+Set `USER_A_PASSWORD` and `USER_B_PASSWORD` in `backend/.env`. See `.env.example` for format. Use strong random passwords in production.
 
 ### Environment Variables
 
-See `backend/.env.example` for configuration. Key: `DATABASE_URL`, `SECRET_KEY`, optional `LLM_API_KEY`.
+See `.env.example` (root) and `backend/.env.example` for all required variables. Key: `DATABASE_URL`, `SECRET_KEY`, `USER_A_PASSWORD`, `USER_B_PASSWORD`, optional `LLM_API_KEY`.
 
 ## Project Structure
 
