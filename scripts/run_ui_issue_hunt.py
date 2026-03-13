@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 
-from app.ui_hunt import run_ui_smoke_checks
 from app.quality import ensure_artifact_dir
 from app.time_utils import utc_now_compact
+from app.ui_hunt import run_ui_smoke_checks
 
 
 def main() -> None:
