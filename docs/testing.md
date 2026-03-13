@@ -96,3 +96,8 @@ Before merging:
 3. Coverage report is reviewed for regressions in modified modules.
 4. Documentation is updated when test scope or behavior changes.
 5. Quality pipeline logs are stored for review in `artifacts/test_runs/<run_id>/`.
+
+## 5. Runtime warning baseline
+
+- The codebase avoids deprecated `datetime.utcnow()` usage and uses centralized UTC helpers.
+- Any new deprecation warnings in quality logs should be treated as fix candidates before merge.
