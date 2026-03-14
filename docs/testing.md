@@ -53,6 +53,11 @@ End-to-end API and pipeline behavior:
   - run summary artifact creation
   - recommendation persistence
   - idempotent rerun behavior for raw page ingestion
+- `tests/test_frontend_contract.py`
+  - static frontend shell contract (`index.html`, `app.js`, `styles.css`)
+  - known route declarations and required button action wiring
+  - i18n key presence and product user labels (Alexander/Elena)
+  - manual-run UI restriction contract for user A vs user B
 
 ## 1.3 Contract tests
 

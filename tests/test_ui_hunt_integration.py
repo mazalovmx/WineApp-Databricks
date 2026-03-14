@@ -15,11 +15,13 @@ def test_ui_issue_hunt_smoke_checks_pass() -> None:
         "i18n_labels",
         "auth_login_a",
         "manual_run_a",
+        "manual_run_updates_last_run_a",
         "recommended_buys",
         "tried_wines_flow",
         "rating_delete",
         "user_settings_read",
         "user_settings_update",
         "permission_user_b_trigger",
+        "permission_user_b_no_run_change",
     }:
         assert expected in names

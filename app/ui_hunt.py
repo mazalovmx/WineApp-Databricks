@@ -120,14 +120,34 @@ def run_ui_smoke_checks(run_id: str) -> UISmokeResult:
         record("auth_protected_recommendations", success, details)
 
         # 5) Manual run and recommendation retrieval.
+        status_before_a = client.get("/status/last-run")
+        before_payload_a = _json(status_before_a) if status_before_a.status_code == 200 else {}
+        previous_run_id_a = before_payload_a.get("run_id")
+
         run_response = client.post("/runs/trigger", headers=headers_a, json={"mode": "manual"})
         run_json = _json(run_response)
+        run_id_a = run_json.get("run_id")
         success, details = _check(
             run_response.status_code == 200 and run_json.get("status") == "success",
             f"manual run succeeded run_id={run_json.get('run_id')}",
             f"manual run failed status={run_response.status_code} payload={run_json}",
         )
         record("manual_run_a", success, details)
+
+        status_after_a = client.get("/status/last-run")
+        after_payload_a = _json(status_after_a) if status_after_a.status_code == 200 else {}
+        success, details = _check(
+            status_after_a.status_code == 200
+            and bool(run_id_a)
+            and after_payload_a.get("run_id") == run_id_a
+            and after_payload_a.get("run_id") != previous_run_id_a,
+            f"last-run updated to {run_id_a} after user A trigger",
+            (
+                "last-run not updated by user A trigger "
+                f"before={previous_run_id_a} after={after_payload_a.get('run_id')} triggered={run_id_a}"
+            ),
+        )
+        record("manual_run_updates_last_run_a", success, details)
 
         recs = client.get("/recommendations?kind=recommended_buys", headers=headers_a)
         recs_json = _json(recs)
@@ -203,6 +223,10 @@ def run_ui_smoke_checks(run_id: str) -> UISmokeResult:
         record("user_settings_update", success, details)
 
         # 8) Permissions check for User B.
+        status_before_b = client.get("/status/last-run")
+        before_payload_b = _json(status_before_b) if status_before_b.status_code == 200 else {}
+        run_before_b = before_payload_b.get("run_id")
+
         login_b = client.post("/auth/login", json={"user_id": "B", "password": "changeme-b"})
         token_b = _json(login_b).get("access_token", "")
         headers_b = {"Authorization": f"Bearer {token_b}"} if token_b else {}
@@ -213,6 +237,18 @@ def run_ui_smoke_checks(run_id: str) -> UISmokeResult:
             f"user B trigger expected 403, got {trigger_b.status_code}",
         )
         record("permission_user_b_trigger", success, details)
+
+        status_after_b = client.get("/status/last-run")
+        after_payload_b = _json(status_after_b) if status_after_b.status_code == 200 else {}
+        success, details = _check(
+            status_after_b.status_code == 200 and after_payload_b.get("run_id") == run_before_b,
+            f"user B trigger did not change last-run ({run_before_b})",
+            (
+                "user B trigger unexpectedly changed last-run "
+                f"before={run_before_b} after={after_payload_b.get('run_id')}"
+            ),
+        )
+        record("permission_user_b_no_run_change", success, details)
 
     return UISmokeResult(
         run_id=run_id,
