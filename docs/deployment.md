@@ -10,6 +10,7 @@ Ship the app automatically to a Linux server with Docker/Compose.
 - `.dockerignore`
 - `docker-compose.yml`
 - `.github/workflows/deploy_server.yml`
+- `.github/workflows/pipeline_schedule.yml`
 
 ## Server prerequisites
 
@@ -31,6 +32,15 @@ Ship the app automatically to a Linux server with Docker/Compose.
 3. If secrets exist, CI connects to server over SSH.
 4. Server pulls latest `main` and runs:
    - `docker compose up -d --build`
+
+## Scheduled pipeline runs (GitHub Actions)
+
+`Pipeline Schedule` workflow runs data refresh automatically:
+
+- daily mode at `0 6 * * *` (UTC)
+- weekly mode at `0 7 * * 1` (UTC, Monday)
+
+Manual run is also available via `workflow_dispatch` with `mode` selector (`daily|weekly|manual`).
 
 ## Runtime configuration
 

@@ -68,6 +68,15 @@ Batch-first web app for two users to discover affordable wines in Guadalajara, c
 - `docs/deployment.md`
 - `docs/llm-agnostic.md`
 
+## Scheduled pipeline execution
+
+- GitHub Actions schedule workflow: `.github/workflows/pipeline_schedule.yml`
+- Default UTC schedule:
+  - daily: `0 6 * * *`
+  - weekly: `0 7 * * 1`
+- Manual launch with mode:
+  - Actions → `Pipeline Schedule` → `Run workflow` → select `daily|weekly|manual`
+
 Quality/doc enforcement scripts:
 
 - `python3 scripts/repo_hygiene_check.py`

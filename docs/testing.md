@@ -58,6 +58,9 @@ End-to-end API and pipeline behavior:
   - known route declarations and required button action wiring
   - i18n key presence and product user labels (Alexander/Elena)
   - manual-run UI restriction contract for user A vs user B
+- `tests/test_schedule_workflow_contract.py`
+  - validates scheduled pipeline workflow exists and declares daily/weekly cron
+  - validates workflow-dispatch mode input and run commands
 
 ## 1.3 Contract tests
 
@@ -100,6 +103,7 @@ Run a focused module:
 
 - `python3 -m pytest -q tests/test_api.py`
 - `python3 -m pytest -q tests/test_auth_unit.py`
+- `python3 -m pytest -q tests/test_schedule_workflow_contract.py`
 
 ## 4. CI Expectations for Done
 
