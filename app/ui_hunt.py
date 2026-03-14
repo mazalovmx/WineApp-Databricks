@@ -58,7 +58,7 @@ def run_ui_smoke_checks(run_id: str) -> UISmokeResult:
 
     with TestClient(app) as client:
         # 1) App shell and routes.
-        for path in ["/", "/tried", "/ratings/new", "/settings"]:
+        for path in ["/", "/home", "/login", "/auth", "/tried", "/ratings/new", "/settings"]:
             response = client.get(path)
             success, details = _check(
                 response.status_code == 200 and "text/html" in response.headers.get("content-type", ""),

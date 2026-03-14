@@ -22,8 +22,9 @@ def test_index_shell_includes_frontend_bundle() -> None:
 def test_frontend_declares_all_known_routes() -> None:
     with TestClient(app) as client:
         js = _static_text(client, "/static/app.js")
+        assert "const ROUTES" in js
         assert "const KNOWN_ROUTES" in js
-        for route in ['"/"', '"/tried"', '"/ratings/new"', '"/settings"']:
+        for route in ['"/"', '"/home"', '"/login"', '"/auth"', '"/tried"', '"/ratings/new"', '"/settings"']:
             assert route in js
 
 

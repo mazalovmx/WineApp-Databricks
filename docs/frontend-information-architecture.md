@@ -28,7 +28,10 @@ Global persistent controls:
 
 ## 3. Route Map
 
-- `/` → Home dashboard
+- `/` → redirect/canonical to `/home`
+- `/login` → dedicated login page
+- `/auth` → dedicated authorization page
+- `/home` → Home dashboard
 - `/tried` → Tried wines list + filters + detail panel
 - `/ratings/new` → Rating submission
 - `/settings` → User/locale preferences + run controls

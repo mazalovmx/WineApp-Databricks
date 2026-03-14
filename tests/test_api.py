@@ -129,7 +129,7 @@ def test_favorites_get_populated_after_rating_and_rerun() -> None:
 
 def test_frontend_routes_serve_html() -> None:
     with TestClient(app) as client:
-        for path in ["/", "/tried", "/ratings/new", "/settings"]:
+        for path in ["/", "/home", "/login", "/auth", "/tried", "/ratings/new", "/settings"]:
             response = client.get(path)
             assert response.status_code == 200
             assert "text/html" in response.headers["content-type"]

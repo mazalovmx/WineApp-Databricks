@@ -1,5 +1,15 @@
 (function () {
-  const KNOWN_ROUTES = new Set(["/", "/tried", "/ratings/new", "/settings"]);
+  const ROUTES = {
+    root: "/",
+    home: "/home",
+    login: "/login",
+    auth: "/auth",
+    tried: "/tried",
+    ratingNew: "/ratings/new",
+    settings: "/settings",
+  };
+  const KNOWN_ROUTES = new Set(Object.values(ROUTES));
+  const PUBLIC_ROUTES = new Set([ROUTES.login, ROUTES.auth]);
   const STORAGE_KEYS = {
     token: "gwf_token",
     locale: "gwf_locale",
@@ -53,6 +63,11 @@
       authRequired: "Please login to load user-specific data.",
       runCompleted: "Run completed successfully.",
       routeNotFound: "Route not found. Redirected to Home.",
+      loginPageTitle: "Login",
+      authPageTitle: "Authorization",
+      loginPageHint: "Open login/authorization pages and sign in to continue.",
+      navLogin: "Login",
+      navAuthorization: "Authorization",
       invalidRating: "Rating must be from 1 to 5.",
       invalidWineId: "Wine ID must be a positive number.",
       modeDaily: "daily",
@@ -133,6 +148,11 @@
       authRequired: "Войдите, чтобы загрузить пользовательские данные.",
       runCompleted: "Прогон успешно завершен.",
       routeNotFound: "Маршрут не найден. Выполнен переход на главную.",
+      loginPageTitle: "Вход",
+      authPageTitle: "Авторизация",
+      loginPageHint: "Откройте страницы входа/авторизации и выполните вход, чтобы продолжить.",
+      navLogin: "Вход",
+      navAuthorization: "Авторизация",
       invalidRating: "Оценка должна быть от 1 до 5.",
       invalidWineId: "ID вина должен быть положительным числом.",
       modeDaily: "ежедневно",
@@ -201,8 +221,17 @@
   state.loginPassword = defaultPassword(state.activeUser);
 
   function normalizeRoute(pathname) {
+    if (pathname === ROUTES.root) return ROUTES.home;
     if (KNOWN_ROUTES.has(pathname)) return pathname;
-    return "/";
+    return ROUTES.login;
+  }
+
+  function isPublicRoute(route) {
+    return PUBLIC_ROUTES.has(route);
+  }
+
+  function isProtectedRoute(route) {
+    return !isPublicRoute(route);
   }
 
   function t(key) {
@@ -267,9 +296,14 @@
   }
 
   function navigate(path) {
-    const target = normalizeRoute(path);
-    if (target !== path) {
+    const normalized = normalizeRoute(path);
+    let target = normalized;
+    if (normalized !== path) {
       setStatus("status-error", t("routeNotFound"));
+    }
+    if (isProtectedRoute(target) && !state.token) {
+      target = ROUTES.login;
+      setStatus("status-no_data", t("authRequired"));
     }
     if (window.location.pathname !== target) window.history.pushState({}, "", target);
     state.route = target;
@@ -413,6 +447,25 @@
               ? skeletonRecommendationList(2)
               : recommendationCards(state.favorites)
           }
+        </div>
+      </section>
+    `;
+  }
+
+  function renderAuthPage() {
+    const title = state.route === ROUTES.auth ? t("authPageTitle") : t("loginPageTitle");
+    return `
+      <section class="panel">
+        <h2>${escapeHtml(title)}</h2>
+        <p class="muted">${escapeHtml(t("loginPageHint"))}</p>
+        <div class="inline">
+          <button class="button" data-action="login">${escapeHtml(t("login"))}</button>
+          <a href="${ROUTES.login}" class="nav-tab" data-action="route" data-route="${ROUTES.login}">${escapeHtml(
+            t("navLogin")
+          )}</a>
+          <a href="${ROUTES.auth}" class="nav-tab" data-action="route" data-route="${ROUTES.auth}">${escapeHtml(
+            t("navAuthorization")
+          )}</a>
         </div>
       </section>
     `;
@@ -578,9 +631,10 @@
   }
 
   function renderContent() {
-    if (state.route === "/") return renderHomePage();
-    if (state.route === "/tried") return renderTriedPage();
-    if (state.route === "/ratings/new") return renderRatingPage();
+    if (state.route === ROUTES.home || state.route === ROUTES.root) return renderHomePage();
+    if (state.route === ROUTES.tried) return renderTriedPage();
+    if (state.route === ROUTES.ratingNew) return renderRatingPage();
+    if (state.route === ROUTES.login || state.route === ROUTES.auth) return renderAuthPage();
     return renderSettingsPage();
   }
 
@@ -636,10 +690,12 @@
           </div>
           <p class="muted">${escapeHtml(t("loginHelp"))}</p>
           <nav class="nav-tabs" aria-label="Main Navigation">
-            ${navLink("/", t("home"))}
-            ${navLink("/tried", t("tried"))}
-            ${navLink("/ratings/new", t("addRating"))}
-            ${navLink("/settings", t("settings"))}
+            ${navLink(ROUTES.login, t("navLogin"))}
+            ${navLink(ROUTES.auth, t("navAuthorization"))}
+            ${navLink(ROUTES.home, t("home"))}
+            ${navLink(ROUTES.tried, t("tried"))}
+            ${navLink(ROUTES.ratingNew, t("addRating"))}
+            ${navLink(ROUTES.settings, t("settings"))}
           </nav>
         </header>
 
@@ -857,23 +913,30 @@
   }
 
   async function loadRouteData() {
-    if (state.route === "/") {
+    if (isPublicRoute(state.route)) {
+      return;
+    }
+    if (state.route === ROUTES.home || state.route === ROUTES.root) {
       await Promise.all([loadRecommendations("recommended_buys"), loadRecommendations("cheapest_favorites")]);
       await loadRunInfo();
       return;
     }
-    if (state.route === "/tried") {
+    if (state.route === ROUTES.tried) {
       await loadTriedWines();
       return;
     }
-    if (state.route === "/settings") {
+    if (state.route === ROUTES.settings) {
       await loadRunInfo();
     }
   }
 
   function bindEvents() {
     window.addEventListener("popstate", () => {
-      state.route = normalizeRoute(window.location.pathname);
+      const popped = normalizeRoute(window.location.pathname);
+      state.route = isProtectedRoute(popped) && !state.token ? ROUTES.login : popped;
+      if (window.location.pathname !== state.route) {
+        window.history.replaceState({}, "", state.route);
+      }
       render();
       void loadRouteData();
     });
@@ -885,7 +948,7 @@
       const action = target.getAttribute("data-action");
       if (action === "route") {
         event.preventDefault();
-        const path = target.getAttribute("data-route") || "/";
+        const path = target.getAttribute("data-route") || ROUTES.home;
         navigate(path);
         return;
       }
@@ -907,9 +970,8 @@
             saveSession();
             await loadMe();
             await loadUserSettings();
-            await loadRouteData();
             await loadHealth();
-            render();
+            navigate(ROUTES.home);
           } catch (error) {
             setStatus("status-error", `${t("loginFailed")} ${String(error.message || error)}`);
           }
@@ -922,7 +984,7 @@
         state.me = null;
         saveSession();
         setStatus("status-no_data", t("notLoggedIn"));
-        render();
+        navigate(ROUTES.login);
         return;
       }
 
@@ -989,6 +1051,10 @@
           state.token = "";
           state.me = null;
           setStatus("status-no_data", t("authRequired"));
+          state.route = ROUTES.login;
+          if (window.location.pathname !== state.route) {
+            window.history.pushState({}, "", state.route);
+          }
         }
         state.activeUser = next;
         state.loginPassword = defaultPassword(next);
@@ -1031,6 +1097,14 @@
 
   async function init() {
     bindEvents();
+    if (!state.token && isProtectedRoute(state.route)) {
+      state.route = ROUTES.login;
+    } else if (state.token && isPublicRoute(state.route)) {
+      state.route = ROUTES.home;
+    }
+    if (window.location.pathname !== state.route) {
+      window.history.replaceState({}, "", state.route);
+    }
     render();
     if (state.token) {
       await loadMe();

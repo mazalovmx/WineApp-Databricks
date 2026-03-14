@@ -58,6 +58,21 @@ def root() -> FileResponse:
     return FileResponse("app/static/index.html")
 
 
+@app.get("/home", include_in_schema=False)
+def home_page() -> FileResponse:
+    return FileResponse("app/static/index.html")
+
+
+@app.get("/login", include_in_schema=False)
+def login_page() -> FileResponse:
+    return FileResponse("app/static/index.html")
+
+
+@app.get("/auth", include_in_schema=False)
+def auth_page() -> FileResponse:
+    return FileResponse("app/static/index.html")
+
+
 @app.get("/tried", include_in_schema=False)
 def tried_page() -> FileResponse:
     return FileResponse("app/static/index.html")

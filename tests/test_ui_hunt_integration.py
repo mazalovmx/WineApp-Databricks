@@ -7,6 +7,9 @@ def test_ui_issue_hunt_smoke_checks_pass() -> None:
     names = {check.name for check in result.checks}
     for expected in {
         "route_html_/",
+        "route_html_/home",
+        "route_html_/login",
+        "route_html_/auth",
         "route_html_/tried",
         "route_html_/ratings/new",
         "route_html_/settings",
